@@ -31,3 +31,4 @@ jobs:
       run: |
         docker build . --file Dockerfile --tag ${{ env.image_name }}:${{ needs.init.outputs.sha }} --build-arg POSTGRES_DB=${{ secrets.POSTGRES_DB }} --build-arg POSTGRES_USER=${{ secrets.POSTGRES_USER }} --build-arg POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
         docker tag ${{ env.image_name }}:${{ needs.init.outputs.sha }} ghcr.io/${{ secrets.DOCKER_USERNAME }}/${{ env.image_name }}:${{ needs.init.outputs.sha }}
+        docker push ghcr.io/${{ secrets.DOCKER_USERNAME }}/${{ env.image_name }}:${{ needs.init.outputs.sha }}
