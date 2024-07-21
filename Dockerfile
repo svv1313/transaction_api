@@ -1,6 +1,9 @@
 # Use docker multi-stage builds to build the NestJS app
 FROM node:18 AS builder
 
+ARG POSTGRES_DB
+ARG POSTGRES_USER
+ARG POSTGRES_PASSWORD
 
 WORKDIR /usr/src/app
 
@@ -29,7 +32,11 @@ COPY package*.json ./
 # Install app dependencies
 RUN npm install --only=production
 
-COPY .env /usr/src/app/
+ENV POSTGRES_DB=POSTGRES_DB
+ENV POSTGRES_USER=POSTGRES_USER
+ENV POSTGRES_PASSWORD=POSTGRES_PASSWORD
+
+
 COPY ecosystem.config.js /usr/src/app/
 
 # Copy built assets from builder stage
