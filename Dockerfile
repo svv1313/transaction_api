@@ -36,7 +36,7 @@ ENV POSTGRES_DB=POSTGRES_DB
 ENV POSTGRES_USER=POSTGRES_USER
 ENV POSTGRES_PASSWORD=POSTGRES_PASSWORD
 
-
+COPY .env /usr/src/app/
 COPY ecosystem.config.js /usr/src/app/
 
 # Copy built assets from builder stage

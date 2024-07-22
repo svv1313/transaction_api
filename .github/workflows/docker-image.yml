@@ -7,6 +7,7 @@ on:
     branches: ['main']
 env:
   image_name: transaction_api
+  node_version: 18
 
 jobs:
   init:
@@ -17,6 +18,21 @@ jobs:
         run: echo "::set-output name=sha::$(echo $GITHUB_SHA | cut -c1-7)"
     outputs:
       sha: ${{ steps.get_sha.outputs.sha }}
+  test:
+    runs-on: ubuntu-latest
+    needs: init
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.node_version }}
+      - name: Install dependencies
+        run: npm install
+      - name: Lint
+        run: npm run lint
+      - name: Test
+        run: npm run test
   build:
     runs-on: ubuntu-latest
     needs: init
@@ -31,4 +47,4 @@ jobs:
       run: |
         docker build . --file Dockerfile --tag ${{ env.image_name }}:${{ needs.init.outputs.sha }} --build-arg POSTGRES_DB=${{ secrets.POSTGRES_DB }} --build-arg POSTGRES_USER=${{ secrets.POSTGRES_USER }} --build-arg POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
         docker tag ${{ env.image_name }}:${{ needs.init.outputs.sha }} ghcr.io/${{ secrets.DOCKER_USERNAME }}/${{ env.image_name }}:${{ needs.init.outputs.sha }}
-        docker push ghcr.io/${{ secrets.DOCKER_USERNAME }}/${{ env.image_name }}:${{ needs.init.outputs.sha }}
+        
