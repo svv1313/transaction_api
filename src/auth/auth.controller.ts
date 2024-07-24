@@ -2,11 +2,13 @@ import {
   Body,
   Controller,
   Post,
+  Res,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { SignUpDTO } from './dto/auth.dto';
+import { SignInDTO, SignUpDTO } from './dto/auth.dto';
+import { Response } from 'express';
 
 @Controller('v1/auth')
 export class AuthController {
@@ -24,15 +26,21 @@ export class AuthController {
     }
   }
 
-  @Post('/sigin')
+  @Post('/signin')
   @UsePipes(new ValidationPipe())
-  async signIn(@Body() body: SignUpDTO): Promise<string> {
+  async signIn(@Body() body: SignInDTO, @Res() res: Response) {
     try {
-      await this.authService.signIn(body);
-      return 'Success';
+      const tokens = await this.authService.signIn(body);
+      res.cookie('refreshToken', tokens.refreshToken, {
+        httpOnly: true,
+        secure: true, // TODO: Need to use cookie only in prod
+        sameSite: 'strict',
+      });
+
+      res.send({ accessToken: tokens.accessToken });
     } catch (error) {
       console.error(error);
-      return error;
+      res.status(500).send({ message: error.message });
     }
   }
 }
