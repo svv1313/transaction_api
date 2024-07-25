@@ -37,8 +37,3 @@ export class SignInDTO {
 export interface SignInResponse {
   token: string;
 }
-
-export class RefreshTokenDTO {
-  @IsString()
-  refreshToken: string;
-}

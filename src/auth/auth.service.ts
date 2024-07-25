@@ -11,6 +11,7 @@ import { SignInDTO, SignUpDTO } from './dto/auth.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { REFRESH_TOKEN_EXPIRES_IN, TOKEN_EXPIRES_IN } from './auth.const';
 
 @Injectable()
 export class AuthService {
@@ -65,18 +66,48 @@ export class AuthService {
     };
 
     const accessToken = this.jwtService.sign(payload, {
-      expiresIn: '1m',
+      expiresIn: TOKEN_EXPIRES_IN,
       secret: this.configService.get<string>('JWT_SECRET'),
     });
     const refreshToken = this.jwtService.sign(
       { userId: user.id },
       {
-        expiresIn: '1d',
+        expiresIn: REFRESH_TOKEN_EXPIRES_IN,
         secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
       },
     );
 
     return { accessToken, refreshToken };
+  }
+
+  async refresh(refreshToken: string): Promise<string> {
+    const payload = this.jwtService.verify(refreshToken, {
+      secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+    });
+
+    const accessToken = await this.generateAccessToken(payload.userId);
+
+    return accessToken;
+  }
+
+  private async generateAccessToken(userId: number): Promise<string> {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const payload = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+    };
+
+    return this.jwtService.sign(payload, {
+      expiresIn: TOKEN_EXPIRES_IN,
+      secret: this.configService.get<string>('JWT_SECRET'),
+    });
   }
 
   async findOneByEmail(email: string): Promise<User> {

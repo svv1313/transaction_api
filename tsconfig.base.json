@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "@svv1313/be-services-lib": [
+        "./src/types/@svv1313/be-services-lib.d.ts"
+      ],
+    },
+    "module": "commonjs",
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "ES2019",
+    "moduleResolution": "node",
+    "incremental": false,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "strict": true,
+    "strictPropertyInitialization": false,
+    "allowJs": true,
+    "rootDir": ".",
+    "baseUrl": ".",
+    "resolveJsonModule": true,
+    "typeRoots": ["./node_modules/@types"],
+    "lib": ["ES2015", "ES2016", "ES2017", "ES2018", "ES2019", "ES2020"]
+  },
+  "exclude": ["node_modules", "dist"]
+}

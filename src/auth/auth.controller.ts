@@ -43,4 +43,16 @@ export class AuthController {
       res.status(500).send({ message: error.message });
     }
   }
+
+  @Post('/refresh')
+  async refresh(@Res() res: Response) {
+    try {
+      const refreshToken = res.req.cookies['refreshToken'];
+      const accessToken = await this.authService.refresh(refreshToken);
+      res.send({ accessToken });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ message: error.message });
+    }
+  }
 }
